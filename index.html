@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EXP-AI Terminal</title>
+    <style>
+        body {
+            background-color: #0d1117;
+            color: #58a6ff;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 20px;
+            margin: 0;
+        }
+        #terminal {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+        #output {
+            height: 300px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            white-space: pre-wrap;
+            border-bottom: 1px solid #21262d;
+            padding-bottom: 10px;
+        }
+        .system { color: #8b949e; }
+        .user { color: #7ee787; }
+        .ai { color: #ff7b72; }
+        .input-line {
+            display: flex;
+            align-items: center;
+        }
+        .prompt {
+            margin-right: 10px;
+            color: #7ee787;
+        }
+        #input {
+            background: transparent;
+            border: none;
+            color: #58a6ff;
+            font-family: inherit;
+            font-size: 16px;
+            flex-grow: 1;
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+
+<div id="terminal">
+    <div id="output"><span class="system">[RFOF-NETWORK EXP-AI TERMINAL V1.0.0]</span>
+<span class="system">Statistisches Neuronales Netzwerk geladen (Lokales Modell im Browser).</span>
+<span class="system">Geben Sie einen Text ein, um das neuronale Muster zu analysieren...</span>
+</div>
+    <div class="input-line">
+        <span class="prompt">rfof-ai@network:~$</span>
+        <input type="text" id="input" autofocus autocomplete="off">
+    </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
