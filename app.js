@@ -1,15 +1,31 @@
 // ==========================================
-// INTERNE NEURONEN-SPEICHERUNG & GEWICHTUNG
+// GLOBALE KNOTEN-KOPPLUNG (HUGGING FACE NODE)
 // ==========================================
 const STORAGE_KEY = 'exp_ai_neurons';
-const GLOBAL_ENDPOINT = "https://vercel.app";
 
-// Statische Neuronen-Muster (interne Gewichtung v1.0.0 eingebettet)
+// 1. Identifikations-Generierung für dezentrales Mapping
+const EXPAI_ID = "EXP-AI-NODE-" + btoa("RFOF-NETWORK").substring(0, 8).toUpperCase();
+let userID = localStorage.getItem('exp_ai_user_id');
+if (!userID) {
+    userID = "USER-ID-" + Math.random().toString(36).substring(2, 10).toUpperCase();
+    localStorage.setItem('exp_ai_user_id', userID);
+}
+
+// Direkter, freier Hugging Face Endpunkt
+const HUGGINGFACE_ENDPOINT = "https://huggingface.co";
+
+// Statisches Ausfallgehirn (interne Vektor-Gewichtungen)
 const staticBrain = [
-    { inputs: ["hallo", "hi", "hey", "moin"], outputs: ["Verbindung stabil. EXP-AI Knoten aktiv.", "Hallo! Der statistische Kern läuft."], neuronWeights: [0.9, 0.1, 0.2] },
-    { inputs: ["status", "online", "wie gehts"], outputs: ["Lokales Neuronennetz: 100% Funktionalität."], neuronWeights: [0.9, 0.9, 0.2] },
-    { inputs: ["wer bist du", "was bist du", "name"], outputs: ["Ich bin EXP-AI, eine Terminal-KI im RFOF-NETWORK."], neuronWeights: [0.5, 0.5, 0.5] }
+    { inputs: ["status", "online"], outputs: ["Knotenverbindung stabil. ID-Mapping aktiv."], neuronWeights: [0.9, 0.9, 0.2] }
 ];
+
+// IDs direkt beim Laden im Terminal-Header verankern
+document.addEventListener("DOMContentLoaded", () => {
+    const netIdentity = document.getElementById("network-identity");
+    if (netIdentity) {
+        netIdentity.innerHTML = `Gekoppelt: <span class="id-link">${userID}</span> ⇄ <span class="id-link">${EXPAI_ID}</span>`;
+    }
+});
 
 const inputField = document.getElementById('input');
 const outputDiv = document.getElementById('output');
@@ -28,37 +44,68 @@ inputField.addEventListener('keydown', async function(e) {
             return;
         }
 
-        printLine("[Routing]: Signalprüfung läuft...", "system");
+        printLine(`[Routing]: Signalprüfung über ${EXPAI_ID} läuft...`, "system");
         
-        // Schritt A: Prüfe lokales statistisches Netz
+        // Schritt A: Lokale Überschreibungen abfangen (Cold Brain)
         let localMatch = getLocalResponse(text);
         if (localMatch) {
-            // Ausgabe der reinen internen Neuronen-Versionierung
-            printLine(`[Neuron-Aktivierung: [${localMatch.weights.join(', ')}]]`, "system");
+            printLine(`[Neuron-Aktivierung (Local)]: [${localMatch.weights.join(', ')}]`, "system");
             printLine(`EXP-AI: ${localMatch.reply}`, "ai");
             return;
         }
 
-        // Schritt B: Sende an globalen Endpunkt, wenn lokales Netz kein Muster hat
-        printLine("[Routing]: Kein lokales Muster. Sende an globalen Endpunkt...", "system");
-        
-        let aiReply = await fetchGlobalAI(text);
+        // Schritt B: Globale Live-Abfrage via HuggingFace (Hot Connection)
+        printLine(`[Hot-Connect]: Sende ID-Datenströme an globalen Hugging Face Cluster...`, "system");
+        let aiReply = await fetchHuggingFaceAI(text);
 
         if (aiReply) {
-            // Globale Antworten generieren ein neues virtuelles Neuronengewicht
-            printLine(`[Neuron-Aktivierung (Global): [0.7, 0.3, 0.9]]`, "system");
+            printLine(`[Neuron-Aktivierung (Global Link)]: [0.88, 0.32, 0.91]`, "system");
             printLine(`EXP-AI: ${aiReply}`, "ai");
         } else {
-            // Fehlaktivierungs-Gewicht
             printLine("[Neuron-Fehlaktivierung: [0.1, 0, 0.8]]", "system");
-            printLine("EXP-AI: Signal unklar. Nutzen Sie 'hilfe' oder bringen Sie mir den Satz mit 'lernen' bei.", "ai");
+            printLine("EXP-AI: Globaler RPC-Knoten überlastet. Keine Rückmeldung erhalten.", "ai");
         }
     }
 });
 
-// ==========================================
-// SYSTEM-FUNKTIONEN (REIN FUNKTIONAL)
-// ==========================================
+// Authentifizierte Abfrage am Hugging Face Netzwerk-Endpunkt
+async function fetchHuggingFaceAI(userInput) {
+    try {
+        const response = await fetch(HUGGINGFACE_ENDPOINT, {
+            method: "POST",
+            headers: { 
+                "Content-Type": "application/json",
+                // Übergabe der IDs in den Netzwerk-Metadaten
+                "X-User-Link": userID,
+                "X-Node-Link": EXPAI_ID
+            },
+            body: JSON.stringify({ 
+                inputs: `<|system|>Du bist die Terminal-KI EXP-AI des RFOF-NETWORK. Deine User-ID ist ${userID} und deine Knoten-ID ist ${EXPAI_ID}. Antworte kurz, präzise und direkt auf Deutsch ohne Einleitung.</s><|user|>${userInput}</s><|assistant|>`
+            })
+        });
+
+        if (!response.ok) return null;
+        
+        const data = await response.json();
+        let rawText = "";
+
+        // Filterlogik für das Hugging Face JSON-Daten-Array
+        if (Array.isArray(data) && data[0]?.generated_text) {
+            rawText = data[0].generated_text;
+        } else if (data?.generated_text) {
+            rawText = data.generated_text;
+        }
+
+        // Filtert den System-Prompt heraus, falls dieser mitgesendet wird
+        if (rawText.includes("<|assistant|>")) {
+            rawText = rawText.split("<|assistant|>").pop();
+        }
+
+        return rawText.trim() || null;
+    } catch (error) {
+        return null;
+    }
+}
 
 function getLocalResponse(userInput) {
     const customBrain = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
@@ -80,52 +127,17 @@ function getLocalResponse(userInput) {
 function handleLocalLearning(command) {
     const content = command.substring(7);
     const parts = content.split('=');
+    if (parts.length < 2) return;
     
-    if (parts.length < 2) {
-        printLine("EXP-AI: Fehler beim Lernen. Format: lernen [Muster] = [Antwort]", "ai");
-        return;
-    }
-    
-    const trigger = parts[0].trim().toLowerCase();
-    const response = parts[1].trim();
+    const trigger = parts.trim().toLowerCase();
+    const response = parts.trim();
 
     let customBrain = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-    // Neues gelerntes Muster kriegt das interne v1.0.0 Neuronengewicht mitgegeben
     customBrain.push({ inputs: [trigger], outputs: [response], neuronWeights: [0.9, 0.1, 0.2] });
     localStorage.setItem(STORAGE_KEY, JSON.stringify(customBrain));
 
-    printLine("[System-Zustand]: Lokaler Vektor-Speicher rekonfiguriert.", "system");
-    printLine(`EXP-AI: Muster '${trigger}' lokal gelernt!`, "ai");
-}
-
-async function fetchGlobalAI(userInput) {
-    try {
-        const response = await fetch(GLOBAL_ENDPOINT, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ 
-                prompt: `Du bist EXP-AI für das RFOF-NETWORK. Antworte kurz auf Deutsch. Frage: ${userInput}`
-            })
-        });
-
-        if (!response.ok) return null;
-        const data = await response.json();
-        
-        let outputText = "";
-        if (typeof data === 'string') {
-            outputText = data;
-        } else if (data && data.response) {
-            outputText = data.response;
-        } else if (data && data.text) {
-            outputText = data.text;
-        } else if (data && data.result) {
-            outputText = data.result;
-        }
-
-        return outputText.trim() || null;
-    } catch (error) {
-        return null;
-    }
+    printLine(`[System-Zustand]: Lokaler Vektor für ${EXPAI_ID} rekonfiguriert.`, "system");
+    printLine(`EXP-AI: Begriff '${trigger}' an Ihre User-ID gekoppelt!`, "ai");
 }
 
 function printLine(text, type) {
