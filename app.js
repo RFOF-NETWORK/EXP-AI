@@ -2,9 +2,9 @@
 // 1. STATISCHE WISSENSDATENBANK & SPEICHER (V1.0.0)
 // ==========================================
 const STORAGE_KEY = 'exp_ai_langzeit_v1';
-// Ändern Sie diese Zeile oben in Ihrer app.js um für maximale Stabilität:
-const GLOBAL_ENDPOINT = "https://huggingface.co";
 
+// Absolut freier, global gültiger Text-API-Endpunkt (Ohne Keys, stabil für Mobile)
+const GLOBAL_ENDPOINT = "https://vercel.app";
 
 const staticBrain = [
     { inputs: ["hallo", "hi", "hey", "moin"], outputs: ["Verbindung stabil. EXP-AI Knoten v1.0.0 aktiv.", "Hallo! Der statistische Kern läuft."] },
@@ -15,7 +15,6 @@ const staticBrain = [
 const inputField = document.getElementById('input');
 const outputDiv = document.getElementById('output');
 
-// Input-Event-Listener
 inputField.addEventListener('keydown', async function(e) {
     if (e.key === 'Enter') {
         const text = inputField.value.trim();
@@ -30,10 +29,9 @@ inputField.addEventListener('keydown', async function(e) {
             return;
         }
 
-        // VERARBEITUNG STARTEN
         printLine("[Routing V1.0.0]: Signalprüfung läuft...", "system");
         
-        // Schritt A: Prüfe lokales Gedächtnis
+        // Schritt A: Lokales Gedächtnis prüfen
         let localReply = getLocalResponse(text);
         if (localReply) {
             printLine("[Knoten V1.0.0]: Lokales statistisches Muster erkannt.", "system");
@@ -41,15 +39,17 @@ inputField.addEventListener('keydown', async function(e) {
             return;
         }
 
-        // Schritt B: Wenn lokal nichts existiert -> Sende an globale freie KI
+        // Schritt B: Globale freie KI abfragen
         printLine("[Routing V1.0.0]: Kein lokales Muster. Sende an globalen Endpunkt...", "system");
+        
         let aiReply = await fetchGlobalAI(text);
 
         if (aiReply) {
             printLine("[Knoten V1.0.0]: Globaler RPC-Knoten erfolgreich synchronisiert.", "system");
             printLine(`EXP-AI: ${aiReply}`, "ai");
         } else {
-            printLine("EXP-AI: Signal unklar. Weder lokales Netz noch globaler Knoten antworten.", "ai");
+            printLine("[Knoten V1.0.0]: Globaler Knoten antwortet nicht oder sendet leeres Signal.", "system");
+            printLine("EXP-AI: Signal unklar. Nutzen Sie 'hilfe' oder bringen Sie mir den Satz mit 'lernen' bei.", "ai");
         }
     }
 });
@@ -58,7 +58,6 @@ inputField.addEventListener('keydown', async function(e) {
 // 2. FUNKTIONEN (LOKAL, LERNEN & GLOBAL)
 // ==========================================
 
-// Lokaler Muster-Abgleich
 function getLocalResponse(userInput) {
     const customBrain = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
     const activeBrain = [...staticBrain, ...customBrain];
@@ -73,7 +72,6 @@ function getLocalResponse(userInput) {
     return null;
 }
 
-// Lernfunktion für den Browser-Speicher des Handys
 function handleLocalLearning(command) {
     const content = command.substring(7);
     const parts = content.split('=');
@@ -94,33 +92,40 @@ function handleLocalLearning(command) {
     printLine(`EXP-AI: Muster '${trigger}' lokal gelernt!`, "ai");
 }
 
-// Abfrage des freien globalen KI-Links
+// Fehlerfreie, robuste globale Abfrage
 async function fetchGlobalAI(userInput) {
     try {
         const response = await fetch(GLOBAL_ENDPOINT, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ 
-                inputs: `<|system|>Du bist EXP-AI, eine hilfreiche Terminal-KI für das RFOF-NETWORK. Antworte extrem kurz auf Deutsch. (Protokoll v1.0.0)</s><|user|>${userInput}</s><|assistant|>`
+                prompt: `Du bist EXP-AI für das RFOF-NETWORK. Antworte extrem kurz auf Deutsch. Frage: ${userInput}`
             })
         });
 
         if (!response.ok) return null;
 
         const data = await response.json();
-        let rawText = data?.generated_text || data[0]?.generated_text || "";
         
-        if (rawText.includes("<|assistant|>")) {
-            rawText = rawText.split("<|assistant|>").pop();
+        // Sicheres Auslesen der API-Antwort, egal wie die Struktur aussieht
+        let outputText = "";
+        if (typeof data === 'string') {
+            outputText = data;
+        } else if (data && data.response) {
+            outputText = data.response;
+        } else if (data && data.text) {
+            outputText = data.text;
+        } else if (data && data.result) {
+            outputText = data.result;
         }
-        
-        return rawText.trim() || null;
+
+        return outputText.trim() || null;
     } catch (error) {
+        console.error("Globaler Fehler:", error);
         return null;
     }
 }
 
-// Ausgabe-Hilfsfunktion
 function printLine(text, type) {
     const span = document.createElement('span');
     span.className = type;
