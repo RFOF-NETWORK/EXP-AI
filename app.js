@@ -6,9 +6,9 @@ const GLOBAL_ENDPOINT = "https://vercel.app";
 
 // Statische Neuronen-Muster (interne Gewichtung v1.0.0 eingebettet)
 const staticBrain = [
-    { inputs: ["hallo", "hi", "hey", "moin"], outputs: ["Verbindung stabil. EXP-AI Knoten aktiv.", "Hallo! Der statistische Kern läuft."], neuronVersion: [1, 0, 0] },
-    { inputs: ["status", "online", "wie gehts"], outputs: ["Lokales Neuronennetz: 100% Funktionalität."], neuronVersion: [1, 0, 0] },
-    { inputs: ["wer bist du", "was bist du", "name"], outputs: ["Ich bin EXP-AI, eine Terminal-KI im RFOF-NETWORK."], neuronVersion: [1, 0, 0] }
+    { inputs: ["hallo", "hi", "hey", "moin"], outputs: ["Verbindung stabil. EXP-AI Knoten aktiv.", "Hallo! Der statistische Kern läuft."], neuronWeights: [0.9, 0.1, 0.2] },
+    { inputs: ["status", "online", "wie gehts"], outputs: ["Lokales Neuronennetz: 100% Funktionalität."], neuronWeights: [0.9, 0.9, 0.2] },
+    { inputs: ["wer bist du", "was bist du", "name"], outputs: ["Ich bin EXP-AI, eine Terminal-KI im RFOF-NETWORK."], neuronWeights: [0.5, 0.5, 0.5] }
 ];
 
 const inputField = document.getElementById('input');
@@ -34,7 +34,7 @@ inputField.addEventListener('keydown', async function(e) {
         let localMatch = getLocalResponse(text);
         if (localMatch) {
             // Ausgabe der reinen internen Neuronen-Versionierung
-            printLine(`[Neuron-Aktivierung: [${localMatch.version.join(', ')}]]`, "system");
+            printLine(`[Neuron-Aktivierung: [${localMatch.weights.join(', ')}]]`, "system");
             printLine(`EXP-AI: ${localMatch.reply}`, "ai");
             return;
         }
@@ -45,12 +45,12 @@ inputField.addEventListener('keydown', async function(e) {
         let aiReply = await fetchGlobalAI(text);
 
         if (aiReply) {
-            // Globale Antworten generieren ein neues virtuelles Neuronengewicht [1, 0, 0]
-            printLine(`[Neuron-Aktivierung (Global): [1, 0, 0]]`, "system");
+            // Globale Antworten generieren ein neues virtuelles Neuronengewicht
+            printLine(`[Neuron-Aktivierung (Global): [0.7, 0.3, 0.9]]`, "system");
             printLine(`EXP-AI: ${aiReply}`, "ai");
         } else {
             // Fehlaktivierungs-Gewicht
-            printLine("[Neuron-Fehlaktivierung: [0, 0, 0]]", "system");
+            printLine("[Neuron-Fehlaktivierung: [0.1, 0, 0.8]]", "system");
             printLine("EXP-AI: Signal unklar. Nutzen Sie 'hilfe' oder bringen Sie mir den Satz mit 'lernen' bei.", "ai");
         }
     }
@@ -69,7 +69,7 @@ function getLocalResponse(userInput) {
             if (userInput.toLowerCase().includes(trigger)) {
                 return {
                     reply: entry.outputs[Math.floor(Math.random() * entry.outputs.length)],
-                    version: entry.neuronVersion || [1, 0, 0]
+                    weights: entry.neuronWeights || [0.9, 0.1, 0.2]
                 };
             }
         }
@@ -91,7 +91,7 @@ function handleLocalLearning(command) {
 
     let customBrain = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
     // Neues gelerntes Muster kriegt das interne v1.0.0 Neuronengewicht mitgegeben
-    customBrain.push({ inputs: [trigger], outputs: [response], neuronVersion: [1, 0, 0] });
+    customBrain.push({ inputs: [trigger], outputs: [response], neuronWeights: [0.9, 0.1, 0.2] });
     localStorage.setItem(STORAGE_KEY, JSON.stringify(customBrain));
 
     printLine("[System-Zustand]: Lokaler Vektor-Speicher rekonfiguriert.", "system");
