@@ -1,15 +1,14 @@
 // ==========================================
-// 1. STATISCHE WISSENSDATENBANK & SPEICHER (V1.0.0)
+// INTERNE NEURONEN-SPEICHERUNG & GEWICHTUNG
 // ==========================================
-const STORAGE_KEY = 'exp_ai_langzeit_v1';
-
-// Absolut freier, global gültiger Text-API-Endpunkt (Ohne Keys, stabil für Mobile)
+const STORAGE_KEY = 'exp_ai_neurons';
 const GLOBAL_ENDPOINT = "https://vercel.app";
 
+// Statische Neuronen-Muster (interne Gewichtung v1.0.0 eingebettet)
 const staticBrain = [
-    { inputs: ["hallo", "hi", "hey", "moin"], outputs: ["Verbindung stabil. EXP-AI Knoten v1.0.0 aktiv.", "Hallo! Der statistische Kern läuft."] },
-    { inputs: ["status", "online", "wie gehts"], outputs: ["Lokales Neuronennetz v1.0.0: 100% Funktionalität."] },
-    { inputs: ["wer bist du", "was bist du", "name"], outputs: ["Ich bin EXP-AI, eine Terminal-KI im RFOF-NETWORK."] }
+    { inputs: ["hallo", "hi", "hey", "moin"], outputs: ["Verbindung stabil. EXP-AI Knoten aktiv.", "Hallo! Der statistische Kern läuft."], neuronVersion: [1, 0, 0] },
+    { inputs: ["status", "online", "wie gehts"], outputs: ["Lokales Neuronennetz: 100% Funktionalität."], neuronVersion: [1, 0, 0] },
+    { inputs: ["wer bist du", "was bist du", "name"], outputs: ["Ich bin EXP-AI, eine Terminal-KI im RFOF-NETWORK."], neuronVersion: [1, 0, 0] }
 ];
 
 const inputField = document.getElementById('input');
@@ -20,7 +19,7 @@ inputField.addEventListener('keydown', async function(e) {
         const text = inputField.value.trim();
         if (text === '') return;
 
-        printLine(`rfof-ai@network-v1:~$ ${text}`, 'user');
+        printLine(`rfof-ai@network:~$ ${text}`, 'user');
         inputField.value = '';
 
         // LERN-MODUS ABFANGEN
@@ -29,33 +28,36 @@ inputField.addEventListener('keydown', async function(e) {
             return;
         }
 
-        printLine("[Routing V1.0.0]: Signalprüfung läuft...", "system");
+        printLine("[Routing]: Signalprüfung läuft...", "system");
         
-        // Schritt A: Lokales Gedächtnis prüfen
-        let localReply = getLocalResponse(text);
-        if (localReply) {
-            printLine("[Knoten V1.0.0]: Lokales statistisches Muster erkannt.", "system");
-            printLine(`EXP-AI: ${localReply}`, "ai");
+        // Schritt A: Prüfe lokales statistisches Netz
+        let localMatch = getLocalResponse(text);
+        if (localMatch) {
+            // Ausgabe der reinen internen Neuronen-Versionierung
+            printLine(`[Neuron-Aktivierung: [${localMatch.version.join(', ')}]]`, "system");
+            printLine(`EXP-AI: ${localMatch.reply}`, "ai");
             return;
         }
 
-        // Schritt B: Globale freie KI abfragen
-        printLine("[Routing V1.0.0]: Kein lokales Muster. Sende an globalen Endpunkt...", "system");
+        // Schritt B: Sende an globalen Endpunkt, wenn lokales Netz kein Muster hat
+        printLine("[Routing]: Kein lokales Muster. Sende an globalen Endpunkt...", "system");
         
         let aiReply = await fetchGlobalAI(text);
 
         if (aiReply) {
-            printLine("[Knoten V1.0.0]: Globaler RPC-Knoten erfolgreich synchronisiert.", "system");
+            // Globale Antworten generieren ein neues virtuelles Neuronengewicht [1, 0, 0]
+            printLine(`[Neuron-Aktivierung (Global): [1, 0, 0]]`, "system");
             printLine(`EXP-AI: ${aiReply}`, "ai");
         } else {
-            printLine("[Knoten V1.0.0]: Globaler Knoten antwortet nicht oder sendet leeres Signal.", "system");
+            // Fehlaktivierungs-Gewicht
+            printLine("[Neuron-Fehlaktivierung: [0, 0, 0]]", "system");
             printLine("EXP-AI: Signal unklar. Nutzen Sie 'hilfe' oder bringen Sie mir den Satz mit 'lernen' bei.", "ai");
         }
     }
 });
 
 // ==========================================
-// 2. FUNKTIONEN (LOKAL, LERNEN & GLOBAL)
+// SYSTEM-FUNKTIONEN (REIN FUNKTIONAL)
 // ==========================================
 
 function getLocalResponse(userInput) {
@@ -65,7 +67,10 @@ function getLocalResponse(userInput) {
     for (let entry of activeBrain) {
         for (let trigger of entry.inputs) {
             if (userInput.toLowerCase().includes(trigger)) {
-                return entry.outputs[Math.floor(Math.random() * entry.outputs.length)];
+                return {
+                    reply: entry.outputs[Math.floor(Math.random() * entry.outputs.length)],
+                    version: entry.neuronVersion || [1, 0, 0]
+                };
             }
         }
     }
@@ -85,29 +90,27 @@ function handleLocalLearning(command) {
     const response = parts[1].trim();
 
     let customBrain = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-    customBrain.push({ inputs: [trigger], outputs: [response] });
+    // Neues gelerntes Muster kriegt das interne v1.0.0 Neuronengewicht mitgegeben
+    customBrain.push({ inputs: [trigger], outputs: [response], neuronVersion: [1, 0, 0] });
     localStorage.setItem(STORAGE_KEY, JSON.stringify(customBrain));
 
-    printLine("[System-Zustand V1.0.0]: Lokaler Vektor-Speicher rekonfiguriert.", "system");
+    printLine("[System-Zustand]: Lokaler Vektor-Speicher rekonfiguriert.", "system");
     printLine(`EXP-AI: Muster '${trigger}' lokal gelernt!`, "ai");
 }
 
-// Fehlerfreie, robuste globale Abfrage
 async function fetchGlobalAI(userInput) {
     try {
         const response = await fetch(GLOBAL_ENDPOINT, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ 
-                prompt: `Du bist EXP-AI für das RFOF-NETWORK. Antworte extrem kurz auf Deutsch. Frage: ${userInput}`
+                prompt: `Du bist EXP-AI für das RFOF-NETWORK. Antworte kurz auf Deutsch. Frage: ${userInput}`
             })
         });
 
         if (!response.ok) return null;
-
         const data = await response.json();
         
-        // Sicheres Auslesen der API-Antwort, egal wie die Struktur aussieht
         let outputText = "";
         if (typeof data === 'string') {
             outputText = data;
@@ -121,7 +124,6 @@ async function fetchGlobalAI(userInput) {
 
         return outputText.trim() || null;
     } catch (error) {
-        console.error("Globaler Fehler:", error);
         return null;
     }
 }
