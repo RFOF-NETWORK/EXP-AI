@@ -2,7 +2,9 @@
 // 1. STATISCHE WISSENSDATENBANK & SPEICHER (V1.0.0)
 // ==========================================
 const STORAGE_KEY = 'exp_ai_langzeit_v1';
+// Ändern Sie diese Zeile oben in Ihrer app.js um für maximale Stabilität:
 const GLOBAL_ENDPOINT = "https://huggingface.co";
+
 
 const staticBrain = [
     { inputs: ["hallo", "hi", "hey", "moin"], outputs: ["Verbindung stabil. EXP-AI Knoten v1.0.0 aktiv.", "Hallo! Der statistische Kern läuft."] },
