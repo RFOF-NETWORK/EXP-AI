@@ -3,32 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EXP-AI Core Terminal</title>
+    <title>EXP-AI Dashboard</title>
     <style>
-        body { background-color: #0d1117; color: #58a6ff; font-family: monospace; padding: 20px; margin: 0; }
-        #terminal { max-width: 800px; margin: 0 auto; background-color: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 15px; }
-        #output { height: 400px; overflow-y: auto; margin-bottom: 15px; white-space: pre-wrap; border-bottom: 1px solid #21262d; }
-        .system { color: #8b949e; }
-        .user { color: #7ee787; }
-        .ai { color: #ff7b72; }
-        .id-link { color: #d2a8ff; font-weight: bold; }
-        .input-line { display: flex; align-items: center; }
-        .prompt { margin-right: 10px; color: #7ee787; }
-        #input { background: transparent; border: none; color: #58a6ff; font-family: inherit; font-size: 16px; flex-grow: 1; outline: none; }
+        body { font-family: Arial, sans-serif; background: #121212; color: #fff; padding: 20px; }
+        .widget-container { max-width: 450px; border-radius: 12px; overflow: hidden; border: 1px solid #333; }
     </style>
 </head>
 <body>
-<div id="terminal">
-    <div id="output"><span class="system">[RFOF-NETWORK EXP-AI CORE-NODE]</span>
-<span class="system">Status: Initialisiere globale dezentrale Verknüpfung...</span>
-Synchronisiere Identitäten...</span>
-<span class="system">Netzwerk bereit. Nutzen Sie: 'lernen [Muster] = [Antwort]' oder freie Fragen.</span>
-</div>
-    <div class="input-line">
-        <span class="prompt">rfof-ai@network:~$</span>
-        <input type="text" id="input" autofocus autocomplete="off">
+
+    <h2>Mein EXP-AI Hub</h2>
+    <p>Hier ist das fertige KI-Widget (ohne API-Key eingebunden):</p>
+
+    <!-- CoinGecko-Style Einbindung für KI -->
+    <div class="widget-container">
+        <iframe 
+            src="https://duckduckgo.com" 
+            width="100%" 
+            height="500px" 
+            style="border:none;">
+        </iframe>
     </div>
-</div>
-<script src="app.js"></script>
+
 </body>
 </html>
